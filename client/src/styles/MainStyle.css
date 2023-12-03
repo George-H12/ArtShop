@@ -1,0 +1,20 @@
+body{
+    justify-content: center;
+    align-items: center;
+    font-family: 'Fredericka the Great', serif;
+}
+
+
+.main-content{
+    margin-left: 12%;
+    margin-top: 15%;
+    width: 1100px;
+}
+
+.WelcomeTitle{
+    font-size: 120px;
+}
+
+p{
+    font-size: 20px;
+}

@@ -1,0 +1,19 @@
+.container{
+    margin-left: 45%;
+    margin-top: 20%;
+    max-width: 10px;
+    height: 50vh;
+}
+.email{
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+.password{
+    margin-bottom: 10px;
+}
+
+.submitButton{
+    margin-left: 100px;
+    cursor: pointer;
+}
+
