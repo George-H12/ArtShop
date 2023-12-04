@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-
 const postArt = new mongoose.Schema(
     {
         image: {
