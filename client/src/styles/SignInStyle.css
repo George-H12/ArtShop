@@ -1,19 +1,58 @@
 .container{
-    margin-left: 45%;
-    margin-top: 20%;
+    /* margin-left: 45%;
+    margin-top: 20%; */
     max-width: 10px;
     height: 50vh;
+    position: relative;
+}
+
+.box{
+    position: absolute;
+    left: 42%;
+    top: 90%;
+    width: 400px;
+    height:30vh;
+    background-color:rgb(230, 197, 163);
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
 }
 .email{
+    margin-left: 20px;
     margin-bottom: 10px;
+    border-radius: 10px;
+    height: 50px;
+    
+}
+.signTitle{
+    margin-left: 40%;
+    font-size: larger;
+}
+
+.textSign{
+    height: 50px;
+    width: 300px;
     border-radius: 10px;
 }
 .password{
     margin-bottom: 10px;
+    margin-left: 20px;
 }
 
 .submitButton{
-    margin-left: 100px;
+    margin-left: 80%;
     cursor: pointer;
+    
+}
+
+#signUpB{
+    background:brown;
+    border-radius: 6px;
+    font-size: larger;
+}
+
+#signUpB:hover{
+    background-color: blueviolet;
+
 }
 
