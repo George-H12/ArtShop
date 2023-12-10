@@ -25,13 +25,24 @@ export const signin = async (req, res, next) => {
     const {username, password} = req.body;
     try{
         const validUser = await User.findOne({username})
-
+       
         if (!validUser) return next(errorHandler(404, "User Not Found!"))
 
         if (password !== validUser.password) return next(errorHandler(401, "Incorrect Credentials!"))
-        const token = jwt.sign({id: validUser._id}, process.env.JWT_SECRET)
-        const {password: pass, ...rest} = validUser._doc;
-        res.cookie('access_token', token, {httpOnly: true}).status(200).json(rest);
+
+        //const token = jwt.sign({username: validUser.username}, process.env.JWT_SECRET)
+
+        // const {password: pass, ...rest} = validUser._doc;
+        //res.json('access_token', token, {httpOnly: true}).status(200).json(rest)
+        //const { password: pass, ...rest } = validUser._doc;
+        const token = jwt.sign({
+            username: validUser.username,
+            id: validUser._id,
+        }, process.env.JWT_SECRET)
+          
+        res.cookie('session_token', token);
+        res.status(200).json({ message: "Signin successful" });
+        //res.status(200).json(rest);
     }catch(error){
         next(error);
     }

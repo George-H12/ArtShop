@@ -4,6 +4,7 @@ import SignIn from './pages/Signin';
 import SignUp from './pages/SignUp';
 import Profile from './pages/Profile';
 import Feed from './pages/Feed';
+import Create from './pages/Create';
 import Header from './components/Header';
 
 
@@ -16,6 +17,7 @@ export default function App() {
         <Route path ="/sign-up" element = {<SignUp />}/>
         <Route path ="/profile" element = {<Profile />}/>
         <Route path ="/feed" element = {<Feed />}/>
+        <Route path ="/create" element = {<Create />}/>
       </Routes>
     </BrowserRouter>
   )

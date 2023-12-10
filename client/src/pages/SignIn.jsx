@@ -23,7 +23,7 @@ export default function SignIn() {
           username: state.username,
           password: state.password
         };
-        axios.post("http://localhost:3000/api/auth/signin", userData).then((response) => {
+        axios.post("http://localhost:3000/api/auth/signin", userData, { withCredentials: true }).then((response) => {
           console.log(response);
           history('/feed');
         })
