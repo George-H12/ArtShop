@@ -815,5 +815,11 @@ export default function ImageModal({ image, onClose }) {
 This CSS file styles Feed.jsx. I designed the list of paintings to be formatted in a grid so users can scroll through the posts faster.
 
 ### Profile
+<img width="1440" alt="PaintingsForSale" src="https://github.com/George-H12/ArtShop/assets/78202573/d4601557-ca56-4c8f-84fc-557f9080e99b">
+<img width="1440" alt="PaintingsSold" src="https://github.com/George-H12/ArtShop/assets/78202573/8531b313-bc3d-471a-814d-90cc680830d8">
+<img width="1440" alt="PaintingsBought" src="https://github.com/George-H12/ArtShop/assets/78202573/2b2b659d-a52e-4a35-b5f5-935bf43dc239">
+
+
+
 
 
