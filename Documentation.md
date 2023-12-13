@@ -1098,4 +1098,540 @@ Axios was used here to call each function listed before and retrieve data.
 ```
 ProfileStyle.CSS was used to style Profile.jsx. As previously mentioned, the posts are listed in a grid format to help the user scroll better.
 
+### Create Page
+<img width="1440" alt="CreatePage" src="https://github.com/George-H12/ArtShop/assets/78202573/24877eac-bec3-45fd-b7d3-4ef4fce58db8">
+
+
+#### post.controller.js
+```JavaScript
+export const insertPost =  async (req, res) => {
+
+    const {image, description, price, userId} = req.body;
+    
+    try {
+        
+        const newPost = new Post({
+        image,
+        description,
+        price,
+        user: userId, 
+        });
+
+        await newPost.save();
+
+        res.status(201).json({
+        success: true,
+        message: 'Post created successfully!',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+        success: false,
+        message: 'Internal Server Error',
+        });
+    }
+
+}
+```
+Once the user submits the post they want to sell, the post will be inserted into the database. The function imsertPost handles that.
+
+#### Create.jsx
+
+```JavaScript
+import React, {useState, useEffect} from 'react'
+import {useNavigate} from 'react-router-dom'
+import useUser from '../hooks/useUser.hook';
+import '../styles/CreateStyle.css';
+import axios from 'axios';
+import ApiClient from '../api/APIClient';
+
+export default function Create() {
+    const history = useNavigate();
+    const { userData, loading } = useUser(); 
+    const [formData, setFormData] = useState({
+      image: '',
+      description: '',
+      price: 0,
+      userId: userData ? userData._id : null, 
+    });
+    useEffect(() => {
+     
+        if (!loading && userData) {
+          console.log("User Data:", userData);
+          setFormData((prevState) => ({
+            ...prevState,
+            userId: userData._id,
+          }))
+        }
+      }, [loading, userData]);
+  
+    const handleChange = (fieldName) => (e) => {
+      const value = e.target.value;
+      setFormData((prevState) => ({
+        ...prevState,
+        [fieldName]: value,
+      }));
+    };
+
+    const onImageChange = (event) => {
+        if (event.target.files && event.target.files[0]) {
+          let img = event.target.files[0];
+          const fileReader = new FileReader();
+          fileReader.onload = function (fileLoadedEvent) {
+            const data = fileLoadedEvent.target.result;
+            setFormData((prevState) => ({
+              ...prevState,
+              image: data,
+            }));
+          };
+          fileReader.readAsDataURL(img);
+        }
+      };
+      
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (!userData || loading) {
+            console.log("User data is not available yet.");
+            return;
+          }
+
+        const postData = {
+            image: formData.image,
+            description: formData.description,
+            price: formData.price,
+            userId: formData.userId
+        };
+        ApiClient.post("/api/post/create", postData).then((response) => {
+          console.log(response);
+          history('/feed');
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error.response);
+            console.log("server responded");
+          } else if (error.request) {
+            console.log("network error");
+          } else {
+            console.log(error);
+          }
+        });
+    }
+
+
+    return (
+        
+      <form onSubmit={handleSubmit} className='create-form'>
+
+      <div className="form-group">
+        <label htmlFor="image">Image URL:</label>
+        <input type="file" name="myImage" onChange={onImageChange} />
+      </div>
+      <div className="form-group">
+        <label htmlFor="description">Description:</label>
+        <textarea
+          id="descriptionInput"
+          value={formData.description}
+          onChange={handleChange('description')}
+          maxLength={50}
+          required
+        />
+      </div>
+      <div className="form-group">
+        <label htmlFor="price">Price:</label>
+        <input 
+          type="number"
+          id="priceInput"
+          value={formData.price}
+          onChange={handleChange('price')}
+          required
+        />
+      </div>
+      <button id = "CreateButton" type="submit">Create Post</button>
+      <img className="preview-image" src={formData.image} alt="Preview" />
+    </form>
+    )
+}
+
+```
+Axios is used to post data into the backend. The function onImageChange, changes the image into base64 format.
+
+#### CreateStyle.css
+```CSS
+
+
+.create-form {
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid black;
+    background-color:rgb(230, 197, 163);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: 5%;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+    margin-left: 50%;
+    border: 5px solid black;
+  }
+  
+  label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  #priceInput{
+    width: 10%;
+    border-radius: 6px;
+  }
+  #descriptionInput{
+    width: 60%;
+    border-radius: 6px;
+  }
+  
+
+  
+  textarea {
+    resize: vertical;
+  }
+  
+  .preview-image {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    /* margin-top: 16px; */
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  #CreateButton {
+    background-color: #3498db;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease-in-out;
+    margin-left: 80%;
+  }
+  
+  #CreateButton:hover {
+    background-color: #2980b9;
+  }
+  
+```
+CreateStyle.css styles Create.jsx.
+
+### Buy Page
+<img width="1440" alt="BuyPage" src="https://github.com/George-H12/ArtShop/assets/78202573/71e3351d-3734-4cfe-9237-0dac6f32187c">
+
+#### user.controller.js
+
+```JavaScript
+export const buyPost = async (req, res, next) => {
+    const {post_id} = req.body;
+    console.log(post_id)
+    try{
+        const token = req.cookies['session_token'];
+        const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const { id } = verifiedToken;
+
+        await User.findByIdAndUpdate(
+            id,
+            { $push: { paintingsBought: post_id } },
+            { new: true }
+          );
+          await Post.findByIdAndUpdate(
+            post_id,
+            { forSale: false },
+            { new: true }
+          );
+
+          res.status(200).json({ success: true, message: 'Post bought successfully' })
+
+    }catch(error){
+        next(error)
+    }
+};
+```
+The buyPost function is responsible of adding the paintings to the paintingBought array.
+
+
+#### Buy.jsx
+```JavaScript
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import ApiClient from '../api/APIClient';
+import '../styles/BuyStyle.css';
+
+export default function Buy() {
+  // Access the post_id from the URL parameters
+  const history = useNavigate();
+  const { post_id } = useParams();
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    const postData = {
+        post_id,
+    };
+    try {
+        
+        const response = await ApiClient.post('/api/user/buyArt', postData);
+        
+        console.log('Buy request successful:', response.data);
+        history('/feed');
+    } catch (error) {
+        console.error('Error submitting buy request:', error);
+    }
+    };
+
+    return (
+    <>
+
+<div className="buy-container">
+        <h2 className="buy-heading">Buy Painting</h2>
+        <form onSubmit={handleSubmit} className="buy-form">
+          <label htmlFor="cardNumber" className="buy-label">
+            Card Number:
+            <input
+              type="text"
+              id="cardNumber"
+              placeholder="1234 5678 9012 3456"
+              className="buy-input"
+              required = "true"
+            />
+          </label>
+          <label htmlFor="expiryDate" className="buy-label">
+            Expiry Date:
+            <input
+              type="text"
+              id="expiryDate"
+              placeholder="MM/YY"
+              className="buy-input"
+              required = "true"
+            />
+          </label>
+          <label htmlFor="cvv" className="buy-label">
+            CVV:
+            <input
+              type="text"
+              id="cvv"
+              placeholder="123"
+              className="buy-input"
+              required = "true"
+            />
+          </label>
+          <label htmlFor="address" className="buy-label">
+            Address:
+            <textarea
+              id="address"
+              placeholder="Enter your address"
+              className="buy-textarea"
+              required = "true"
+            />
+          </label>
+          <button type="submit" className="buy-submit">
+            Buy
+          </button>
+        </form>
+      </div>
+    </>
+    );
+}
+
+```
+The Buy.jsx file posts data into the backend where all the data is managed. The inputs are also set to required. Obviously I am not going to make the user actually post their actual card since the website is not public
+
+#### BuyStyle.css
+```CSS
+/* BuyStyle.css */
+
+.buy-container {
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color:rgb(230, 197, 163);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .buy-heading {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .buy-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .buy-label {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  .buy-input,
+  .buy-textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+  }
+  
+  .buy-submit {
+    background-color: #db7434;
+    color: black;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.3s ease-in-out;
+  }
+  
+  .buy-button:hover {
+    background-color: #2980b9;
+  }
+  
+```
+The BuyStyle.css was used to style Buy.jsx.
+
+
+### App.jsx
+```JavaScript
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import Home from "./pages/Home";
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import Profile from './pages/Profile';
+import Feed from './pages/Feed';
+import Create from './pages/Create';
+import Buy from './pages/Buy';
+
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route 
+          path="/" 
+          element={<Home />}
+        />
+        <Route 
+          path="/sign-in" 
+          element={<SignIn />}
+        />
+        <Route 
+          path="/sign-up" 
+          element={<SignUp />}
+        />
+        <Route 
+          path="/profile/:userName" 
+          element={<Profile />}/>
+        <Route 
+          path="/feed" 
+          element={<Feed />}/>
+        <Route 
+          path="/create" 
+          element={<Create />}
+        />
+        <Route 
+          path="/buy/:post_id" 
+          element={<Buy />}
+        />
+         <Route 
+          path="/buy" 
+          element={<Buy />}
+        />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+```
+The main file where all the react files are rendered is in App.jsx.
+
+### index.js
+
+```JavaScript
+import express from 'express';
+import mongoose from 'mongoose';
+import session from 'express-session';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import userRouter from './routes/user.route.js';
+import authRouter from './routes/auth.route.js';
+import postRouter from './routes/post.route.js';
+import cookieParser from 'cookie-parser';
+
+
+dotenv.config()
+const app = express();
+
+
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173'];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, 
+};
+
+
+app.use(cors(corsOptions));
+app.use(cookieParser());
+
+
+app.use(session({
+    secret: 'your-secret-key', 
+    resave: false,
+    saveUninitialized: true,
+    store: new session.MemoryStore(),
+  }));
+
+app.use(express.json({ limit: '10mb' }))
+
+
+mongoose.connect(process.env.MONGO).then(() => {
+    console.log("Connected to MongoDB!");
+}).catch((err) => {
+    console.log(err);
+})
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000!')
+})
+
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/post", postRouter);
+
+
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    return res.status(statusCode).json({
+        success: false,
+        statusCode, 
+        message,
+
+    });
+})
+```
+The main file in the backend where everything is manged is index.js. As you can see I also use cors to connect the two servers together.
 
