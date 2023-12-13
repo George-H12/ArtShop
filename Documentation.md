@@ -4,7 +4,7 @@ Hello and welcome to my ArtShop! 🎨 Explore a world of creativity and inspirat
 
 Function: Users must first create an account. Once created they will be redirected to the feed where all non-digital art are posted for sale. Users will be able to like posts and buy as well. User will be able to post their paintings to the feed. I disallowed users to like their own paintings (That's for the ones who like their posts on Instagram). Users will be able to navigate to their own and others' profiles. The profile contains three tabs: Paintings for sale, Paintings sold, and Paintings bought. Similar to the feed, each tab will render a list of the user's paintings. That was a quick summary, here is a video of how the website works: [Arto](https://youtu.be/EZzNakfyxYg?si=vKeINQGYx3CC659n). 
 
-What I used to build the application: React.js and CSS for the frontend, and MongoDB and Node.js for the backend.
+What I used to build the application: React.js and CSS for the frontend, and MongoDB and Node.js for the backend. I created two main folders: api and client. The client folder handles the frontend and the api folder handles the backend. The application is basically running on two servers.
 
 I only used two database models: the User and Post models.
 
