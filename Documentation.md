@@ -8,7 +8,7 @@ What I used to build the application: React.js and CSS for the frontend, and Mon
 
 I only used two database models: the User and Post models.
 
-## User Schema
+## User Model
 
 Here is an example of a user schema in Mongoose for managing user information in the ArtShop:
 
@@ -43,3 +43,51 @@ const User = mongoose.model('User', userSchema);
 export default User;
 ```
 Most are pretty self-explanatory, but for the ones who do not understand MongoDB syntax, I created an array named paintingsBought which stores all the paintings the specific user buys.
+
+### Post Model
+```JavaScript
+import mongoose from 'mongoose';
+
+const postArt = new mongoose.Schema(
+    {
+        image: {
+            type: String,
+            required: true,
+          },
+          description: {
+            type: String,
+            max: 50,
+            required: true,
+          },
+          likes: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'User', 
+            },
+          ],
+          price: {
+            type: Number,
+            required: true,
+          },
+          forSale: {
+            type: Boolean,
+            default: true,
+          },
+          timestamp: {
+            type: Date,
+            default: Date.now,
+          },
+          user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+          },
+    },
+);
+
+const Post = mongoose.model('Post', postArt);
+
+export default Post;
+```
+Like before most are self-explanatory. There is a reference to the user, which means that the user created post. The Likes attribute contains a list of all the users who liked the post.
+
+
