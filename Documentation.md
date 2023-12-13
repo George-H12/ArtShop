@@ -8,3 +8,37 @@ What I used to build the application: React.js and CSS for the frontend, and Mon
 
 I only used two database models: the User and Post models.
 
+## User Schema
+
+Here is an example of a user schema in Mongoose for managing user information in the ArtShop:
+
+```javascript
+import mongoose from 'mongoose';
+
+const userSchema = new mongoose.Schema(
+    {
+    username: {
+        type: String,
+        required: true,
+        min: 3,
+        max: 20,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    paintingsBought: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Post', // Reference to the Post model
+        },
+    ],
+    },
+    { timestamps: true }
+);
+
+const User = mongoose.model('User', userSchema);
+
+export default User;
+
