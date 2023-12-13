@@ -41,4 +41,5 @@ const userSchema = new mongoose.Schema(
 const User = mongoose.model('User', userSchema);
 
 export default User;
-
+```
+Most are pretty self-explanatory, but for the ones who do not understand MongoDB syntax, I created an array named paintingsBought which stores all the paintings the specific user buys.
