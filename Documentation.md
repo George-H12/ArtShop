@@ -209,7 +209,7 @@ I used HeaderStyle.css and MainStyle.css to style Header.jsx and MainContent.jsx
 I used very similar code to build the two in the frontend
 
 
-###auth.controller.js file
+#### auth.controller.js file
 Backend authorization file
 ```JavaScript
 import User from '../models/user.model.js'
@@ -431,5 +431,389 @@ export default function SignIn() {
 
 ```
 Similar to SignUp data is pushed into the backend where all the data is handled. After signing in, the user will be redirected to the Feed.
+
+#### SignInStyle.css
+```CSS
+.container{
+    max-width: 10px;
+    height: 50vh;
+    position: relative;
+}
+
+.box{
+    position: absolute;
+    left: 42%;
+    top: 90%;
+    width: 400px;
+    height:30vh;
+    background-color:rgb(230, 197, 163);
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+}
+.email{
+    margin-left: 20px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    height: 50px;
+    
+}
+.signTitle{
+    margin-left: 40%;
+    font-size: larger;
+}
+
+.textSign{
+    height: 50px;
+    width: 300px;
+    border-radius: 10px;
+}
+.password{
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
+
+.submitButton{
+    margin-left: 80%;
+    cursor: pointer;
+    
+}
+
+#signUpB{
+    background:brown;
+    border-radius: 6px;
+    font-size: larger;
+}
+
+#signUpB:hover{
+    background-color: blueviolet;
+
+}
+
+
+```
+The SignInStyle.css was used for both jsx files
+
+### Feed Page
+<img width="1440" alt="FeedPage" src="https://github.com/George-H12/ArtShop/assets/78202573/2eea024e-7ba3-40fe-bf30-d3e0bf892ac4">
+The Feed Renders all the posts that are available FOR SALE ONLY from newest to oldest.
+
+#### post.controller.js
+```JavaScript
+export const getAllPosts = async (req, res) => {
+
+    try {
+        const posts = await Post.find({ forSale: true }).sort({ timestamp: -1 }).populate('user');
+        res.status(200).json(posts);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Errorrrr' });
+      }
+    
+}
+```
+The getAllPosts function is a function in the backend that gets all the posts from the data that is for sale from newest to oldest.
+
+```JavaScript
+export const toggleLike = async (req, res) => {
+    const { postId } = req.params;
+    
+    const token = req.cookies['session_token'];
+    console.log(token);
+    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const { id } = verifiedToken;
+    console.log(id)
+    try {
+      const post = await Post.findById(postId);
+  
+      if (!post) {
+        return res.status(404).json({ success: false, message: 'Post not found' });
+      }
+  
+      const isLiked = post.likes.includes(id);
+
+      if (isLiked) {
+        
+        post.likes = post.likes.filter(likeId => likeId.toString() !== id.toString());
+      } else {
+        
+        post.likes.push(id);
+      }
+
+    
+      await post.save();
+     
+      await post.save();
+  
+      res.status(200).json({ success: true, likes: post.likes.length });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+  };
+
+```
+The toggleLike function allows users to like and dislike a painting by clicking on one single button. It is similar to how the instagram like button works. You press it once for the first time and the database will register you as a person who liked the post. If you press it again, toggleLike checks if your id is in the likes attribute array of a particular post. If it is, then you will be removed from the array.
+
+#### Feed.jsx
+```JavaScript
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import '../styles/FeedStyle.css';
+import '../styles/HeaderStyle.css';
+import axios from 'axios';
+import useUser from '../hooks/useUser.hook';
+import ImageModal from '../hooks/ImageModel';
+import ApiClient from '../api/APIClient';
+
+export default function Feed() {
+  const { userData } = useUser();
+  const [posts, setPosts] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [likes, setLikes] = useState({}); 
+
+  useEffect(() => {
+    ApiClient.get('/api/post/feed')
+      .then(response => {
+        setPosts(response.data);
+        
+        const initialLikes = response.data.reduce((acc, post) => {
+          acc[post._id] = post.likes.length; 
+          return acc;
+        }, {});
+        setLikes(initialLikes);
+      })
+      .catch(error => {
+        console.error('Error fetching posts:', error);
+      });
+  }, []); 
+
+
+
+  const handleLike = async (postId) => {
+    try {
+      const response = await ApiClient.post(`/api/post/like/${postId}`);
+      
+      const { likes: newLikeCount } = response.data;
+      
+      setLikes((prevLikes) => ({
+        ...prevLikes,
+        [postId]: newLikeCount,
+      }));
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+  
+
+  return (
+    <>
+      
+      <nav className="navBar">
+        <div id="Title">
+            <h1>Arto</h1>
+        </div>
+        <div className="links">
+        <ul>
+        {userData ? (
+
+          <a href={`/profile/${userData.username}`}>Profile</a>    
+        ) : (
+          <p>Loading user data...</p>
+        )}
+            <a href="/create"><li>Create</li></a>
+
+            <a href="/"><li>Log Out</li></a>
+        </ul>
+        </div>
+    </nav>
+      <div className="feed-container">
+        {userData ? (
+          <div className="welcome-message">
+            <h1>Welcome, {userData.username}!</h1>
+            
+          </div>
+        ) : (
+          <p>Loading user data...</p>
+        )}
+        <h2>Posts:</h2>
+        <ul className="posts-container">
+          {posts.map(post => (
+            <li key={post._id} className="post-item">
+              <img src={post.image} alt={post.description} className="post-image" onClick={() => setSelectedImage(post.image)} />
+              <a className="post-username" href={`/profile/${post.user.username}`}><li>{post.user.username}</li></a>
+              <p className="post-description">{post.description}</p>
+              {userData && post.user._id === userData._id ? (
+                
+                <>
+                <p className="post-price">This is your post</p>
+                <p className="post-price">Price: ${post.price}</p>
+                <p className="like-count">{likes[post._id]} likes</p>
+
+                </>
+              ) : (
+                
+                <>
+                  <p className="post-price">Price: ${post.price}</p>
+                  <p className="like-count">{likes[post._id]} likes</p>
+                  <button
+                    className={`like-button ${likes[post._id] ? 'liked' : ''}`}
+                    onClick={() => handleLike(post._id)}
+                  >
+                    Like
+                  </button>
+                  <Link to={`/buy/${post._id}`} className="buy-button">
+                    Buy
+                  </Link>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {selectedImage && (
+        <ImageModal image={selectedImage} onClose={() => setSelectedImage(null)} />
+      )}
+    </>
+  );
+}
+
+```
+This is the frontend file of the feed. It calls a lot of functions and interacts with the backend several times to get and post data.
+
+<img width="1440" alt="CloseUpImage" src="https://github.com/George-H12/ArtShop/assets/78202573/8ce6d7fe-3f53-4372-8178-29435b85fb3e">
+In the feed, I added a little animation to get a better look of each painting. All the user has to do is click on any painting.
+
+This is a more detailed look at the code that handles this:
+#### ImageModal.jsx
+```JavaScript
+// ImageModal.jsx
+import React from 'react';
+
+export default function ImageModal({ image, onClose }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content">
+        <img src={image} alt="Selected" />
+      </div>
+    </div>
+  );
+}
+
+```
+```JavaScript
+ const [selectedImage, setSelectedImage] = useState(null);
+// More Content
+<img src={post.image} alt={post.description} className="post-image" onClick={() => setSelectedImage(post.image)} />
+// More Content
+{selectedImage && (
+        <ImageModal image={selectedImage} onClose={() => setSelectedImage(null)} />
+      )}
+ </>
+```
+#### FeedStyle.css
+```CSS
+
+
+
+.feed-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+ 
+  .welcome-message {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  
+  .posts-container {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 300px 300px 300px;
+    margin-left: 30%;
+    gap: 50px;
+  }
+  
+ 
+  .post-item {
+    border: 1px solid #ccc;
+    height: fit-content;
+    padding: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+ 
+  .post-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  
+  .post-description {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+ 
+  .post-price {
+    color: #888;
+    font-size: 14px;
+  }
+  
+  .buy-button{
+    margin-left: 90%;
+    font-size: larger;
+    background-color: hsl(0, 49%, 70%);
+    border-radius: 6px;
+    transition: ease-in-out;
+  }
+  .buy-button:hover{
+    color:white;
+    background-color: black;
+  }
+
+  .like-button{
+    margin-top: 10px;
+    font-size: larger;
+  }
+
+
+  
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    max-width: 30%;
+    max-height: 80%;
+    overflow: hidden;
+  }
+  
+  .modal-content img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  
+```
+This CSS file styles Feed.jsx. I designed the list of paintings to be formatted in a grid so users can scroll through the posts faster.
+
+### Profile
 
 
