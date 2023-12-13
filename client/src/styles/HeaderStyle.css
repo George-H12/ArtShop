@@ -29,6 +29,6 @@ ul li{
     transition: ease-in-out;
 } 
 
-ul li:hover{
+.HeaderUl li:hover{
     color: hsl(271, 76%, 53%, 0.75);
 }

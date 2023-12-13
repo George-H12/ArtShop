@@ -9,7 +9,7 @@ export default function FeedHeader() {
         </div>
         <div className="links">
         <ul>
-            <a href="/profile">Profile</a>
+            <a href="/profile"><li>Profile</li></a>
             <a href="/create"><li>Create</li></a>
             <a href="/"><li>Log Out</li></a>
         </ul>

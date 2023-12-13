@@ -69,7 +69,6 @@ export default function SignUp() {
               required/>
           </div>
           <div className="submitButton">
-              {/* <input type="submit" value = "Login" /> */}
               <button id='signUpB' type = "submit">Sign up</button>
           </div>
 

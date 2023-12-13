@@ -9,7 +9,7 @@ export default function Header() {
             <h1>Arto</h1>
         </div>
         <div className="links">
-        <ul>
+        <ul className='HeaderUl'>
             <a href="/"><li>Home</li></a>
             <a href="/sign-in"><li>Sign In</li></a>
             <a href="/sign-up"><li>Sign Up</li></a>

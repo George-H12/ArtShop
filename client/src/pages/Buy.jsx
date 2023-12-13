@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ApiClient from '../api/APIClient';
+import '../styles/BuyStyle.css';
 
 export default function Buy() {
   // Access the post_id from the URL parameters
@@ -13,9 +14,9 @@ const handleSubmit = async (e) => {
         post_id,
     };
     try {
-        // Send a POST request to the backend with post_id and dummy card details
+        
         const response = await ApiClient.post('/api/user/buyArt', postData);
-        // Handle the response as needed (e.g., show a success message)
+        
         console.log('Buy request successful:', response.data);
         history('/feed');
     } catch (error) {
@@ -26,40 +27,53 @@ const handleSubmit = async (e) => {
     return (
     <>
 
-        <div className="buy-container">
-    
-        <h2>Buy Painting</h2>
+<div className="buy-container">
+        <h2 className="buy-heading">Buy Painting</h2>
         <form onSubmit={handleSubmit} className="buy-form">
-            <label>
+          <label htmlFor="cardNumber" className="buy-label">
             Card Number:
             <input
-                type="text"
-                placeholder="1234 5678 9012 3456"
+              type="text"
+              id="cardNumber"
+              placeholder="1234 5678 9012 3456"
+              className="buy-input"
+              required = "true"
             />
-            </label>
-            <label>
+          </label>
+          <label htmlFor="expiryDate" className="buy-label">
             Expiry Date:
             <input
-                type="text"
-                placeholder="MM/YY"
+              type="text"
+              id="expiryDate"
+              placeholder="MM/YY"
+              className="buy-input"
+              required = "true"
             />
-            </label>
-            <label>
+          </label>
+          <label htmlFor="cvv" className="buy-label">
             CVV:
             <input
-                type="text"
-                placeholder="123"
+              type="text"
+              id="cvv"
+              placeholder="123"
+              className="buy-input"
+              required = "true"
             />
-            </label>
-            <label>
+          </label>
+          <label htmlFor="address" className="buy-label">
             Address:
             <textarea
-                placeholder="Enter your address"
+              id="address"
+              placeholder="Enter your address"
+              className="buy-textarea"
+              required = "true"
             />
-            </label>
-            <button type="submit">Submit</button>
+          </label>
+          <button type="submit" className="buy-submit">
+            Buy
+          </button>
         </form>
-        </div>
+      </div>
     </>
     );
 }

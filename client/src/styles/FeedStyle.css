@@ -1,38 +1,38 @@
-/* Add this CSS to your component or a separate styles file */
 
-/* Feed container styles */
+
+
 .feed-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
   }
   
-  /* Welcome message styles */
+ 
   .welcome-message {
     font-size: 24px;
     margin-bottom: 10px;
   }
   
-  /* Posts container styles */
+  
   .posts-container {
     list-style: none;
     padding: 0;
     display: grid;
     grid-template-columns: 300px 300px 300px;
-    /* grid-template-columns: repeat(300px); */
     margin-left: 30%;
     gap: 50px;
   }
   
-  /* Post item styles */
+ 
   .post-item {
     border: 1px solid #ccc;
+    height: fit-content;
     padding: 10px;
     border-radius: 8px;
     overflow: hidden;
   }
   
-  /* Image styles */
+ 
   .post-image {
     width: 100%;
     height: auto;
@@ -40,22 +40,37 @@
     margin-bottom: 10px;
   }
   
-  /* Description styles */
+  
   .post-description {
     font-size: 16px;
     margin-bottom: 8px;
   }
   
-  /* Price styles */
+ 
   .post-price {
     color: #888;
     font-size: 14px;
   }
   
+  .buy-button{
+    margin-left: 90%;
+    font-size: larger;
+    background-color: hsl(0, 49%, 70%);
+    border-radius: 6px;
+    transition: ease-in-out;
+  }
+  .buy-button:hover{
+    color:white;
+    background-color: black;
+  }
 
-  /* Add these styles to your existing CSS */
+  .like-button{
+    margin-top: 10px;
+    font-size: larger;
+  }
 
-/* Modal styles */
+
+  
 .modal-overlay {
     position: fixed;
     top: 0;

@@ -1,20 +1,21 @@
 import React, {useState, useEffect} from 'react'
 import {useNavigate} from 'react-router-dom'
 import useUser from '../hooks/useUser.hook';
+import '../styles/CreateStyle.css';
 import axios from 'axios';
 import ApiClient from '../api/APIClient';
 
 export default function Create() {
     const history = useNavigate();
-    const { userData, loading } = useUser(); // Assuming useUser provides user information
+    const { userData, loading } = useUser(); 
     const [formData, setFormData] = useState({
       image: '',
       description: '',
       price: 0,
-      userId: userData ? userData._id : null, // Include user ID in form data
+      userId: userData ? userData._id : null, 
     });
     useEffect(() => {
-        // Log user data when it's available
+     
         if (!loading && userData) {
           console.log("User Data:", userData);
           setFormData((prevState) => ({
@@ -81,44 +82,34 @@ export default function Create() {
 
     return (
         
-        <form onSubmit={handleSubmit}>
-        <div>
-        {loading ? (
-        <p>Loading user data...</p>
-      ) : (
-        <div>
-          <h1>Welcome, {userData ? userData._id : 'User ID not available'}!</h1>
-        </div>
-      )}
-    </div>
-      <div>
+      <form onSubmit={handleSubmit} className='create-form'>
+
+      <div className="form-group">
         <label htmlFor="image">Image URL:</label>
-        <h1>Select Image</h1>
         <input type="file" name="myImage" onChange={onImageChange} />
       </div>
-      <div>
+      <div className="form-group">
         <label htmlFor="description">Description:</label>
         <textarea
-          id="description"
+          id="descriptionInput"
           value={formData.description}
           onChange={handleChange('description')}
           maxLength={50}
           required
         />
       </div>
-      <div>
+      <div className="form-group">
         <label htmlFor="price">Price:</label>
-        <input
+        <input 
           type="number"
-          id="price"
+          id="priceInput"
           value={formData.price}
           onChange={handleChange('price')}
           required
         />
       </div>
-
-      <img style={{ width: '250px', height: 'auto'}} src={formData.image} />
-      <button type="submit">Create Post</button>
+      <button id = "CreateButton" type="submit">Create Post</button>
+      <img className="preview-image" src={formData.image} alt="Preview" />
     </form>
     )
 }

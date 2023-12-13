@@ -3,7 +3,6 @@ import Post from '../models/post.model.js';
 import jwt from 'jsonwebtoken';
 import { errorHandler } from '../utils/error.js';
 
-// Controller function to fetch user data
 export const getUserData = async (req, res, next) => {
     try {
         const token = req.cookies['session_token'];
@@ -11,9 +10,6 @@ export const getUserData = async (req, res, next) => {
         const { id } = verifiedToken;
         console.log(verifiedToken);
 
-        // const { id } = req.session.user;
-        // console.log(id)
-        //     // Use the user ID or username to fetch additional user data from the database
         const userData = await User.findById(id);
 
         if (!userData) {
@@ -22,7 +18,7 @@ export const getUserData = async (req, res, next) => {
 
         const { password, ...rest } = userData._doc;
 
-        // Send the user data in the response
+      
         res.status(200).json(rest);
     } catch (error) {
         next(error);
@@ -54,4 +50,67 @@ export const buyPost = async (req, res, next) => {
         next(error)
     }
 };
+
+export const getUserSalePosts = async (req, res) => {
+    const { userName } = req.params;
+    try {
+    
+       
+        const user = await User.findOne({ username: userName });
+    
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+    
+       
+        const userPosts = await Post.find({ user: user._id, forSale: true });
+    
+        res.status(200).json(userPosts);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+}
+
+export const getUserSoldPosts = async (req, res) => {
+    const { userName } = req.params;
+    try {
+       
+        const user = await User.findOne({ username: userName });
+
+        if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+        }
+        
+        
+        const userSoldPosts = await Post.find({ user: user._id, forSale: false });
+
+        res.status(200).json(userSoldPosts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+}
+
+export const getUserBoughtPosts = async (req, res) => {
+    const { userName } = req.params;
+    try {
+        
+        const user = await User.findOne({ username: userName });
+
+        if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+        }
+
+        const boughtPostsArray = user.paintingsBought;
+
+        res.status(200).json(boughtPostsArray);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+}
 
