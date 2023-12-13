@@ -819,7 +819,283 @@ This CSS file styles Feed.jsx. I designed the list of paintings to be formatted 
 <img width="1440" alt="PaintingsSold" src="https://github.com/George-H12/ArtShop/assets/78202573/8531b313-bc3d-471a-814d-90cc680830d8">
 <img width="1440" alt="PaintingsBought" src="https://github.com/George-H12/ArtShop/assets/78202573/2b2b659d-a52e-4a35-b5f5-935bf43dc239">
 
+The profile consists of three tabs. The For Sale tab lists user's posts that are for sale. The paintings sold tab lists the user's paintings that were sold. Finally, the paintings bought tab lists the paintings that were bought by the user.
+
+#### user.controller.js
+```JavaScript
+export const getUserSalePosts = async (req, res) => {
+    const { userName } = req.params;
+    try {
+    
+       
+        const user = await User.findOne({ username: userName });
+    
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+    
+       
+        const userPosts = await Post.find({ user: user._id, forSale: true });
+    
+        res.status(200).json(userPosts);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+}
+```
+The getUserSalePosts function in the backend was used to retrieve all the user's posts that are listed as For Sale.
+
+```JavaScript
+export const getUserSoldPosts = async (req, res) => {
+    const { userName } = req.params;
+    try {
+       
+        const user = await User.findOne({ username: userName });
+
+        if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+        }
+        
+        
+        const userSoldPosts = await Post.find({ user: user._id, forSale: false });
+
+        res.status(200).json(userSoldPosts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+}
+```
+The getUserSoldPosts function in the backend was used to retrieve all the user's posts that are listed as Sold.
 
 
+```JavaScript
+export const getUserBoughtPosts = async (req, res) => {
+    const { userName } = req.params;
+    try {
+        
+        const user = await User.findOne({ username: userName });
+
+        if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+        }
+
+        const boughtPostsArray = user.paintingsBought;
+
+        res.status(200).json(boughtPostsArray);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+}
+```
+The getUserBoughtPosts function in the backend was used to retrieve all the paintings that the user bought.
+
+#### Profile.jsx
+```JavaScript
+// Profile.jsx
+import React, { useState, useEffect } from 'react';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { useParams } from 'react-router-dom';
+import 'react-tabs/style/react-tabs.css';
+import '../styles/ProfileStyle.css'
+import ApiClient from '../api/APIClient';
+
+export default function Profile() {
+  const {userName} = useParams()
+  const [paintingsForSale, setPaintingsForSale] = useState([]);
+  const [paintingsSold, setPaintingsSold] = useState([]);
+  const [paintingsBought, setPaintingsBought] = useState([]);
+
+  useEffect(() => {
+    
+    const fetchPaintingsForSale = async () => {
+      try {
+        const response = await ApiClient.get(`/api/user/ForSale/${userName}`);
+        setPaintingsForSale(response.data);
+      } catch (error) {
+        console.error('Error fetching paintings for sale:', error);
+      }
+    };
+
+    
+    const fetchPaintingsSold = async () => {
+      try {
+        const response = await ApiClient.get(`/api/user/Sold/${userName}`);
+        setPaintingsSold(response.data);
+      } catch (error) {
+        console.error('Error fetching paintings sold:', error);
+      }
+    };
+
+   
+    const fetchPaintingsBought = async () => {
+      try {
+        const response = await ApiClient.get(`/api/user/Bought/${userName}`);
+        const boughtPostIds = response.data; 
+        const promises = boughtPostIds.map(async (postId) => {
+          const postResponse = await ApiClient.get(`/api/post/${postId}`);
+          return postResponse.data;
+        });
+    
+        
+        const boughtPostsData = await Promise.all(promises);
+    
+        setPaintingsBought(boughtPostsData);
+      } catch (error) {
+        console.error('Error fetching paintings bought:', error);
+      }
+    };
+
+    fetchPaintingsForSale();
+    fetchPaintingsSold();
+    fetchPaintingsBought();
+  }, [userName]);
+  
+  return (
+    <div className="profile-container">
+      <div className="title-container">
+      <a id = "backtofeed" href="/feed">Back to Feed</a>
+        {userName ? (
+          <h1 className="profile-title">{userName}</h1>
+        ) : (
+          <p>Loading user data...</p>
+        )}
+      </div>
+      <Tabs className="tabs-container">
+        <TabList className="tab-list">
+          <Tab className="tab">Paintings for Sale</Tab>
+          <Tab className="tab">Paintings Sold</Tab>
+          <Tab className="tab">Paintings Bought</Tab>
+        </TabList>
+
+        <TabPanel className="tab-panel">
+          <ul className="posts-container">
+            {paintingsForSale.map(post => (
+              <li key={post._id} className="postProfile-item">
+                {/* Render content for Paintings for Sale */}
+                <img src={post.image} alt={post.description} className="post-image" />
+                <p className="post-description">{post.description}</p>
+                <p className="post-likes">Likes: {post.likes.length}</p>
+                <p className="post-price">Price: ${post.price}</p>
+                {/* Add any other content you want to display */}
+              </li>
+            ))}
+          </ul>
+        </TabPanel>
+
+        <TabPanel className="tab-panel">
+          <ul className="posts-container">
+            {paintingsSold.map(post => (
+              <li key={post._id} className="postProfile-item">
+                {/* Render content for Paintings Sold */}
+                <img src={post.image} alt={post.description} className="post-image" />
+                <p className="post-description">{post.description}</p>
+                <p className="post-likes">Likes: {post.likes.length}</p>
+                <p className="post-price">Price: ${post.price}</p>
+                {/* Add any other content you want to display */}
+              </li>
+            ))}
+          </ul>
+        </TabPanel>
+
+        <TabPanel className="tab-panel">
+        <ul className="posts-container">
+              {paintingsBought.map(post => (
+              <li key={post._id} className="postProfile-item">
+                
+                <img src={post.image} alt={post.description} className="post-image" />
+                <p className="post-description">{post.description}</p>
+                <p className="post-likes">Likes: {post.likes.length}</p>
+                <p className="post-price">Price: ${post.price}</p>
+                
+              </li>
+            ))}
+        </ul>
+        </TabPanel>
+      </Tabs>
+  
+    </div>
+  );
+}
+
+```
+Axios was used here to call each function listed before and retrieve data.
+
+```CSS
+
+.profile-container {
+  width: 80%;
+  height: 100%;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.title-container {
+  text-align: center;
+}
+
+.profile-title {
+  font-size: 24px;
+}
+
+.tabs-container {
+  margin-top: 20px;
+  width: 100%;
+
+}
+
+.tab-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-around; 
+  border-top: 1px solid #ccc; 
+  margin-top: 10px; 
+  width: 100%
+}
+
+.tab {
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+}
+
+.tab:hover {
+  background-color: #f0f0f0;
+}
+
+.tab-panel {
+  margin-top: 20px;
+  width: 100%;
+  display: grid;
+}
+
+.tab-content-title {
+  color: #555;
+}
+
+.postProfile-item{
+  width: 100%; 
+  max-width: 300px; 
+  margin-left: 40%;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#backtofeed{
+  margin-right: 90%;
+}
+
+```
+ProfileStyle.CSS was used to style Profile.jsx. As previously mentioned, the posts are listed in a grid format to help the user scroll better.
 
 
