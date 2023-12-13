@@ -1,4 +1,5 @@
 import User from '../models/user.model.js';
+import Post from '../models/post.model.js';
 import jwt from 'jsonwebtoken';
 import { errorHandler } from '../utils/error.js';
 
@@ -28,12 +29,29 @@ export const getUserData = async (req, res, next) => {
     }
 };
 
+export const buyPost = async (req, res, next) => {
+    const {post_id} = req.body;
+    console.log(post_id)
+    try{
+        const token = req.cookies['session_token'];
+        const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const { id } = verifiedToken;
 
-// export const getUserData = (req, res) => {
-//     res.json({
-//         message: "Hello",
-//     });
-//     // const username = req.user.username;
-//     // console.log(username)
-//    //console.log("Hello")
-// }
+        await User.findByIdAndUpdate(
+            id,
+            { $push: { paintingsBought: post_id } },
+            { new: true }
+          );
+          await Post.findByIdAndUpdate(
+            post_id,
+            { forSale: false },
+            { new: true }
+          );
+
+          res.status(200).json({ success: true, message: 'Post bought successfully' })
+
+    }catch(error){
+        next(error)
+    }
+};
+

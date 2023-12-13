@@ -35,14 +35,8 @@ import sharp from 'sharp';
 
 export const getAllPosts = async (req, res) => {
 
-    // const token = req.cookies['session_token'];
-    // const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
-    //const { username } = verifiedToken;
-    //console.log(verifiedToken);
-    
     try {
-        // Retrieve all posts in descending order of timestamp
-        const posts = await Post.find({}).sort({ timestamp: -1 });
+        const posts = await Post.find({ forSale: true }).sort({ timestamp: -1 });
         res.status(200).json(posts);
       } catch (error) {
         console.error(error);
@@ -81,3 +75,39 @@ export const insertPost =  async (req, res) => {
     }
 
 }
+
+export const toggleLike = async (req, res) => {
+    const { postId } = req.params;
+    //const { userId } = req.body;
+    const token = req.cookies['session_token'];
+    console.log(token);
+    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const { id } = verifiedToken;
+    console.log(id)
+    try {
+      const post = await Post.findById(postId);
+  
+      if (!post) {
+        return res.status(404).json({ success: false, message: 'Post not found' });
+      }
+  
+      // Check if the user already liked the post
+      const userLikedIndex = post.likes.indexOf(id);
+  
+      if (userLikedIndex === -1) {
+        // User has not liked the post, add like
+        post.likes.push(id);
+      } else {
+        // User has already liked the post, remove like
+        post.likes.splice(userLikedIndex, 1);
+      }
+  
+      // Save the updated post
+      await post.save();
+  
+      res.status(200).json({ success: true, likes: post.likes.length });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+  };

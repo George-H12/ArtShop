@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import {useNavigate} from 'react-router-dom'
 import '../styles/SignInStyle.css';
 import axios from 'axios';
+import ApiClient from '../api/APIClient';
 export default function SignIn() {
     const history = useNavigate();
     const [state, setState] = useState({
@@ -23,7 +24,7 @@ export default function SignIn() {
           username: state.username,
           password: state.password
         };
-        axios.post("http://localhost:3000/api/auth/signin", userData, { withCredentials: true }).then((response) => {
+        ApiClient.post("/api/auth/signin", userData).then((response) => {
           console.log(response);
           history('/feed');
         })

@@ -11,10 +11,12 @@ const postArt = new mongoose.Schema(
             max: 50,
             required: true,
           },
-          likeButton: {
-            type: Number,
-            default: 0,
-          },
+          likes: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'User', 
+            },
+          ],
           price: {
             type: Number,
             required: true,

@@ -13,10 +13,12 @@ const userSchema = new mongoose.Schema(
         type: String,
         required: true,
     },
-    profilePicture: {
-        type: String,
-        default: "",
-    },
+    paintingsBought: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Post', // Reference to the Post model
+        },
+    ],
 
     },
     {timestamps: true}

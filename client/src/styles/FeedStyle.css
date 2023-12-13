@@ -1,0 +1,83 @@
+/* Add this CSS to your component or a separate styles file */
+
+/* Feed container styles */
+.feed-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Welcome message styles */
+  .welcome-message {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  /* Posts container styles */
+  .posts-container {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 300px 300px 300px;
+    /* grid-template-columns: repeat(300px); */
+    margin-left: 30%;
+    gap: 50px;
+  }
+  
+  /* Post item styles */
+  .post-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Image styles */
+  .post-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  /* Description styles */
+  .post-description {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  /* Price styles */
+  .post-price {
+    color: #888;
+    font-size: 14px;
+  }
+  
+
+  /* Add these styles to your existing CSS */
+
+/* Modal styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    max-width: 30%;
+    max-height: 80%;
+    overflow: hidden;
+  }
+  
+  .modal-content img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  

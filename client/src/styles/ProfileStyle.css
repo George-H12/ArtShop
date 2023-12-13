@@ -1,0 +1,47 @@
+/* Profile.css */
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-title {
+    color: #333;
+  }
+  
+  .tabs-container {
+    margin-top: 20px;
+  }
+  
+  .tab-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .tab {
+    cursor: pointer;
+    padding: 10px 15px;
+    margin-right: 10px;
+    background-color: #eee;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .tab:hover {
+    background-color: #ddd;
+  }
+  
+  .tab-panel {
+    margin-top: 20px;
+  }
+  
+  .tab-content-title {
+    color: #555;
+  }
+  

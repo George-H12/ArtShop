@@ -26,7 +26,7 @@ export default function SignUp() {
     };
     axios.post("http://localhost:3000/api/auth/signup", userData).then((response) => {
       console.log(response);
-      history('/feed');
+      history('/sign-in');
     })
     .catch((error) => {
       if (error.response) {
