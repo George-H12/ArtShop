@@ -91,5 +91,6 @@ export default Post;
 Like before most are self-explanatory. There is a reference to the user, which means that the user created post. The Likes attribute contains a list of all the users who liked the post.
 
 ![Alt Text](/ArtoImages/HomePage.png)
+<img width="1440" alt="HomePage" src="https://github.com/George-H12/ArtShop/assets/78202573/2198ec03-d1e2-48c4-9f5c-ce0e9891dbc7">
 
 
