@@ -10,7 +10,6 @@ I only used two database models: the User and Post models.
 
 ## User Model
 
-Here is an example of a user schema in Mongoose for managing user information in the ArtShop:
 
 ```javascript
 import mongoose from 'mongoose';
@@ -201,6 +200,236 @@ p{
 ```
 I used HeaderStyle.css and MainStyle.css to style Header.jsx and MainContent.jsx respectively
 
+## SignUp and SignIn pages
 
+<img width="1440" alt="SignUp" src="https://github.com/George-H12/ArtShop/assets/78202573/a5166136-665c-48e2-a307-46e9d1d92d35">
+
+<img width="1440" alt="SignIn" src="https://github.com/George-H12/ArtShop/assets/78202573/8c51ee18-d93f-46ea-9b4e-fb88c498cc82">
+
+I used very similar code to build the two in the frontend
+
+
+###auth.controller.js file
+Backend authorization file
+```JavaScript
+import User from '../models/user.model.js'
+import { errorHandler } from '../utils/error.js';
+import jwt from 'jsonwebtoken';
+
+export const signup = async (req, res, next) => {
+    
+    const {username, password} = req.body;
+    const validUser = await User.findOne({username})
+    if (validUser) return next(errorHandler(404, "User Already Exists!"))
+    
+    const newUser = new User({username, password})
+    try {
+        await newUser.save();
+        res.status(201).json({
+            success: true,
+            message: "User created successfully!"
+        });
+    } catch (error){
+        console.log(error);
+        next(errorHandler(550, "error from the function"));
+    }   
+}
+
+export const signin = async (req, res, next) => {
+    const {username, password} = req.body;
+    try{
+        const validUser = await User.findOne({username})
+       
+        if (!validUser) return next(errorHandler(404, "User Not Found!"))
+
+        if (password !== validUser.password) return next(errorHandler(401, "Incorrect Credentials!"))
+
+        const token = jwt.sign({
+            username: validUser.username,
+            id: validUser._id,
+        }, process.env.JWT_SECRET)
+          
+        res.cookie('session_token', token);
+        res.status(200).json({ message: "Signin successful" });
+        //res.status(200).json(rest);
+    }catch(error){
+        next(error);
+    }
+}
+```
+As you can see I handle errors and send data into the database depending on whether everything is valid. I also use JWT to create a session.
+
+#### Signup.jsx
+```JavaScript
+import React, {useState} from 'react'
+import {useNavigate} from 'react-router-dom'
+import '../styles/SignInStyle.css';
+import axios from 'axios';
+
+export default function SignUp() {
+  const history = useNavigate();
+  const [state, setState] = useState({
+    username: "",
+    password: ""
+  });
+
+  const handleChange = (fieldName) => (e) => {
+    const value = e.target.value;
+    setState({
+      ...state,
+      [fieldName]: value
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const userData = {
+      username: state.username,
+      password: state.password
+    };
+    axios.post("http://localhost:3000/api/auth/signup", userData).then((response) => {
+      console.log(response);
+      history('/sign-in');
+    })
+    .catch((error) => {
+      if (error.response) {
+        console.log(error.response);
+        console.log("server responded");
+      } else if (error.request) {
+        console.log("network error");
+      } else {
+        console.log(error);
+      }
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="container">
+        <div className="box">
+          <div className="signTitle">
+            <h2>Sign Up</h2><br />
+          </div>
+         
+          <div className="email">
+                <input 
+                className = "textSign" 
+                type="text" 
+                name = "username"
+                value = {state.username}
+                onChange = {handleChange('username')}
+                placeholder="username"
+                required/> 
+          </div>
+          <div className="password">
+              <input 
+              className = "textSign" 
+              type="text" 
+              name = "Password"
+              value = {state.password}
+              onChange = {handleChange('password')} 
+              placeholder="Password" 
+              required/>
+          </div>
+          <div className="submitButton">
+              <button id='signUpB' type = "submit">Sign up</button>
+          </div>
+
+        </div>
+          
+      </div>
+    </form>
+  )
+}
+
+```
+I send data to the backend using the Axios package. After the submit button is pressed, the user is redirected to the SignIn page.
+
+#### SignIn.jsx
+```Javascript
+import React, { useState } from 'react'
+import {useNavigate} from 'react-router-dom'
+import '../styles/SignInStyle.css';
+import axios from 'axios';
+import ApiClient from '../api/APIClient';
+export default function SignIn() {
+    const history = useNavigate();
+    const [state, setState] = useState({
+        username: "",
+        password: ""
+      });
+    
+      const handleChange = (fieldName) => (e) => {
+        const value = e.target.value;
+        setState({
+          ...state,
+          [fieldName]: value
+        });
+      };
+    
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const userData = {
+          username: state.username,
+          password: state.password
+        };
+        ApiClient.post("/api/auth/signin", userData).then((response) => {
+          console.log(response);
+          history('/feed');
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error.response);
+            console.log("server responded");
+          } else if (error.request) {
+            console.log("network error");
+          } else {
+            console.log(error);
+          }
+        });
+      };
+    
+      return (
+        <form onSubmit={handleSubmit}>
+          <div className="container">
+            <div className="box">
+              <div className="signTitle">
+                <h2>Sign In</h2><br />
+              </div>
+             
+              <div className="email">
+                    <input 
+                    className = "textSign" 
+                    type="text" 
+                    name = "username"
+                    value = {state.username}
+                    onChange = {handleChange('username')}
+                    placeholder="username"
+                    required/> 
+              </div>
+              <div className="password">
+                  <input 
+                  className = "textSign" 
+                  type="text" 
+                  name = "Password"
+                  value = {state.password}
+                  onChange = {handleChange('password')} 
+                  placeholder="Password" 
+                  required/>
+              </div>
+              <div className="submitButton">
+                  {/* <input type="submit" value = "Login" /> */}
+                  <button id='signUpB' type = "submit">Sign in</button>
+              </div>
+    
+            </div>
+              
+          </div>
+        </form>
+      )
+}
+
+```
+Similar to SignUp data is pushed into the backend where all the data is handled. After signing in, the user will be redirected to the Feed.
 
 
